@@ -23,17 +23,6 @@
     <div class="split-form">
         <div class="auth-container animate-fade-in">
             <h2 class="auth-title">Log in</h2>
-                        {% load socialaccount %}
-            <a href="{% provider_login_url 'google' %}" class="auth-sso-btn" style="text-decoration: none;">
-                <span>Continue with Google</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12s4.477 10 10 10c2.61 0 4.985-1 6.785-2.64"></path><path d="M12 22v-9h9.5"></path></svg>
-            </a>
-            
-            <div class="auth-divider">
-                <div class="line"></div>
-                <span>or</span>
-                <div class="line"></div>
-            </div>
             <form action="{% url 'signin' %}" method="post" class="auth-form-group">
                 {% csrf_token %}
                 <input type="text" name="username" class="auth-input" required placeholder="email or username">

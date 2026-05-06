@@ -1,10 +1,7 @@
 Django==6.0.3
 dj-database-url==3.1.2
-django-allauth==65.16.1
 gunicorn==26.0.0
 psycopg2-binary==2.9.12
 razorpay==2.0.1
 requests==2.32.4
-PyJWT==2.12.1
-cryptography==48.0.0
 whitenoise==6.12.0
