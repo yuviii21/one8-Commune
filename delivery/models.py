@@ -8,6 +8,11 @@ class Customer(models.Model):
     mobile = models.CharField(max_length = 10)
     address = models.CharField(max_length = 50)
 
+class AdminUser(models.Model):
+    username = models.CharField(max_length = 20, unique=True)
+    password = models.CharField(max_length = 20)
+    email = models.CharField(max_length = 20)
+
 class Restaurant(models.Model):
     name = models.CharField(max_length = 20)
     picture = models.URLField(max_length = 200, default='https://designshack.net/wp-content/uploads/Free-Simple-Restaurant-Logo-Template.jpg')
@@ -28,4 +33,10 @@ class Cart(models.Model):
 
     def total_price(self):
         return sum(item.price for item in self.items.all())
+    
+class Order(models.Model):
+    customer = models.ForeignKey(Customer, on_delete = models.CASCADE, related_name = "orders")
+    items = models.ManyToManyField("Item", related_name = "orders")
+    total_price = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
     

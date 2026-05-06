@@ -6,6 +6,12 @@ urlpatterns = [
     path('open_signup', views.open_signup, name='open_signup'),
     path('signup', views.signup, name='signup'),
     path('signin', views.signin, name='signin'),
+    path('customer_home/<str:username>/', views.customer_home, name='customer_home'),
+    path('open_admin_login', views.open_admin_login, name='open_admin_login'),
+    path('admin_login', views.admin_login, name='admin_login'),
+    path('admin_home', views.admin_home, name='admin_home'),
+    path('open_admin_signup', views.open_admin_signup, name='open_admin_signup'),
+    path('admin_signup', views.admin_signup, name='admin_signup'),
     path('open_add_restaurant', views.open_add_restaurant, name='open_add_restaurant'), 
     path('add_restaurant', views.add_restaurant, name='add_restaurant'),
     path('open_show_restaurant', views.open_show_restaurant, name='open_show_restaurant'), 
@@ -21,7 +27,7 @@ urlpatterns = [
     path('show_cart/<str:username>', views.show_cart, name='show_cart'), 
 
     path('checkout/<str:username>/', views.checkout, name='checkout'),
-
+    path('place_order/<str:username>/', views.place_order, name='place_order'),
     path('orders/<str:username>/', views.orders, name='orders'),
 ]
 

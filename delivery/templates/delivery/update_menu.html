@@ -1,58 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <!-- show current menu -->
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Item name</th>
-                <th>Picture</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Is veg/</th>
-            </tr>
-        </thead>
-        <tbody>
-            {%  for item in itemList %}
-                <tr>
-                    <td>{{ item.name }}</td>
-                    <td>
-                        <img src="{{ item.picture }}">
-                    </td>
-                    <td>{{ item.description }}</td>
-                    <td>{{ item.price }}</td>
-                    <td>{{ item.vegeterian }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% extends 'delivery/base.html' %}
 
+{% block title %}Update Menu | one8 Commune{% endblock %}
 
-    <!-- add food item (form) -->
-    <h2>Add Menu Item</h2>
-    <form action="{% url 'update_menu' restaurant.id %}" method="post">
-        {% csrf_token %}
-        <label for="name">Item Name:</label>
-        <input type="text" id="name" name="name" required><br><br>
+{% block content %}
+<div class="animate-fade-in">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h2>Manage Menu</h2>
+            <p style="color: var(--text-muted);">Update items for this restaurant</p>
+        </div>
+        <a href="{% url 'open_show_restaurant' %}" class="btn btn-secondary">Back to Restaurants</a>
+    </div>
 
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea><br><br>
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start;">
+        <!-- Current Menu -->
+        <div class="card" style="padding: 0; overflow-x: auto;">
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
+                <h3 style="margin: 0;">Current Items</h3>
+            </div>
+            <table>
+                <thead style="background-color: var(--bg-elevated);">
+                    <tr>
+                        <th style="padding: 1rem 1.5rem;">Item</th>
+                        <th style="padding: 1rem 1.5rem;">Details</th>
+                        <th style="padding: 1rem 1.5rem;">Type</th>
+                        <th style="padding: 1rem 1.5rem; text-align: right;">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in itemList %}
+                    <tr>
+                        <td style="padding: 1rem 1.5rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); overflow: hidden; background-color: var(--bg-elevated);">
+                                    {% if item.picture %}
+                                    <img src="{{ item.picture }}" alt="{{ item.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% endif %}
+                                </div>
+                                <span style="font-weight: 600;">{{ item.name }}</span>
+                            </div>
+                        </td>
+                        <td style="padding: 1rem 1.5rem; color: var(--text-muted); font-size: 0.9rem;">{{ item.description|truncatechars:30 }}</td>
+                        <td style="padding: 1rem 1.5rem;">
+                            {% if item.vegeterian %}
+                            <span class="badge" style="background: #dcfce7; color: #166534;">Veg</span>
+                            {% else %}
+                            <span class="badge" style="background: #fee2e2; color: #991b1b;">Non-Veg</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 600;">₹{{ item.price }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No items in menu.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-        <label for="price">Price:</label>
-        <input type="number" id="price" name="price" step="0.01" required><br><br>
+        <!-- Add Form -->
+        <div class="card" style="position: sticky; top: 100px;">
+            <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">Add New Item</h3>
+            
+            <form action="{% url 'update_menu' restaurant.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label" for="name">Item Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required placeholder="E.g., Paneer Tikka">
+                </div>
 
-        <label for="vegeterian">Vegetarian:</label>
-        <input type="checkbox" id="vegeterian" name="vegeterian"><br><br>
+                <div class="form-group">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" rows="3" required placeholder="Delicious details..."></textarea>
+                </div>
 
-        <label for="picture">Image URL:</label>
-        <input type="url" id="picture" name="picture"><br><br>
+                <div class="form-group">
+                    <label class="form-label" for="price">Price (₹)</label>
+                    <input type="number" id="price" name="price" step="0.01" class="form-control" required placeholder="0.00">
+                </div>
 
-        <button type="submit">Add Item</button>
-    </form>
-</body>
-</html>
+                <div class="form-group">
+                    <label class="form-label" for="picture">Image URL</label>
+                    <input type="url" id="picture" name="picture" class="form-control" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="vegeterian" name="vegeterian" style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary);">
+                    <label class="form-label" for="vegeterian" style="margin-bottom: 0;">This is a Vegetarian item</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Add Item</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

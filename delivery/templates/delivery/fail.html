@@ -1,11 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h3>login failed!</h3>
-</body>
-</html>
+{% extends 'delivery/base.html' %}
+
+{% block title %}Failed | one8 Commune{% endblock %}
+
+{% block content %}
+<div class="auth-container animate-fade-in" style="max-width: 400px;">
+    <div class="card auth-card">
+        <div style="font-size: 4rem; color: #ef4444; margin-bottom: 1rem;">❌</div>
+        <h2 style="margin-bottom: 1rem; color: #991b1b;">Action Failed</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">We couldn't process your request. Please check your credentials or try again.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button onclick="window.history.back()" class="btn btn-secondary" style="flex: 1;">Try Again</button>
+            <a href="/" class="btn btn-primary" style="flex: 1;">Return Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

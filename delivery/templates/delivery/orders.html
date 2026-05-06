@@ -1,23 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <title>Order Summary</title>
-</head>
-<body>
-    <h1>Thank you for your order, {{ username }}!</h1>
+{% extends 'delivery/base.html' %}
 
+{% block title %}Order History | one8 Commune{% endblock %}
 
-    <h2>Delivery Address</h2>
-    <p>{{ customer.address }}</p>
+{% block content %}
+<div class="animate-fade-in" style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>Your Orders</h2>
+            <p style="color: var(--text-muted);">View your past orders</p>
+        </div>
+        <a href="{% url 'customer_home' username %}" class="btn btn-secondary">Order Food</a>
+    </div>
 
-    <p>Your order will be delivered to this location shortly. Thank you for choosing Meal Mate!</p>
-
-    {% if cart_items %}
-        <a href="{% url 'customer_menu' cart_items.0.restaurant.id username %}">Back to Restaurants</a>
+    {% if order_history %}
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% for order in order_history %}
+            <div class="card" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <span class="badge" style="background-color: #dcfce7; color: #166534; margin-bottom: 0.5rem;">Delivered</span>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Ordered on {{ order.created_at|date:"M d, Y" }} at {{ order.created_at|time:"H:i" }}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h4 style="margin: 0; color: var(--primary);">₹{{ order.total_price }}</h4>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 style="margin-top: 0; margin-bottom: 0.75rem; font-size: 0.95rem;">Items ordered:</h4>
+                    <ul style="list-style-type: none; padding: 0; margin: 0;">
+                        {% for item in order.items.all %}
+                        <li style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                            <span>{{ item.name }}</span>
+                            <span>₹{{ item.price }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
     {% else %}
-        <a href="/">Back to Home</a>
+        <div class="card" style="text-align: center; padding: 4rem 2rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📦</div>
+            <h3 style="margin-bottom: 0.5rem;">No orders yet!</h3>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Looks like you haven't placed any orders with us yet.</p>
+            <a href="{% url 'customer_home' username %}" class="btn btn-primary">Explore Restaurants</a>
+        </div>
     {% endif %}
-</body>
-</html>
+</div>
+{% endblock %}

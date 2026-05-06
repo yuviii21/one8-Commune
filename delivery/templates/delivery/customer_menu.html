@@ -1,45 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h3>Welcome {{username}}!</h3>
+{% extends 'delivery/base.html' %}
 
-    <a href="{% url 'show_cart' username %}" >Go to cart</a>
+{% block title %}Menu | one8 Commune{% endblock %}
 
-    <!-- show current menu -->
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Item name</th>
-                <th>Picture</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Is veg?</th>
-                <th>Operation</th>
-            </tr>
-        </thead>
-        <tbody>
-            {%  for item in itemList %}
-                <tr>
-                    <td>{{ item.name }}</td>
-                    <td>
-                        <img src="{{ item.picture }}">
-                    </td>
-                    <td>{{ item.description }}</td>
-                    <td>{{ item.price }}</td>
-                    <td>{{ item.vegeterian }}</td>
-                    <td>
-                        <a href="{% url 'add_to_cart' item.id username %}">
+{% block content %}
+<div class="animate-fade-in">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h2>Menu Details</h2>
+            <p style="color: var(--text-muted);">Select your favorite items</p>
+        </div>
+        <a href="{% url 'show_cart' username %}" class="btn btn-primary">
+            View Cart 🛒
+        </a>
+    </div>
+
+    <div class="grid-cards">
+        {% for item in itemList %}
+            <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                <div style="height: 200px; overflow: hidden; position: relative;">
+                    {% if item.picture %}
+                        <img src="{{ item.picture }}" alt="{{ item.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 100%; height: 100%; background-color: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 3rem;">🍲</div>
+                    {% endif %}
+                    
+                    {% if item.vegeterian %}
+                        <span style="position: absolute; top: 1rem; right: 1rem; background: #dcfce7; color: #166534; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600; border: 1px solid #bbf7d0;">Veg</span>
+                    {% else %}
+                        <span style="position: absolute; top: 1rem; right: 1rem; background: #fee2e2; color: #991b1b; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600; border: 1px solid #fecaca;">Non-Veg</span>
+                    {% endif %}
+                </div>
+                <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column;">
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">{{ item.name }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; flex: 1;">{{ item.description }}</p>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                        <span class="price-tag">₹{{ item.price }}</span>
+                        <a href="{% url 'add_to_cart' item.id username %}" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                             Add to cart
                         </a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px dashed var(--border);">
+                <p style="color: var(--text-muted); font-size: 1.25rem;">No items available in this menu.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

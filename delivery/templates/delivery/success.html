@@ -1,11 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h3>login success!</h3>
-</body>
-</html>
+{% extends 'delivery/base.html' %}
+
+{% block title %}Success | one8 Commune{% endblock %}
+
+{% block content %}
+<div class="auth-container animate-fade-in" style="max-width: 400px;">
+    <div class="card auth-card">
+        <div style="font-size: 4rem; color: #22c55e; margin-bottom: 1rem;">✅</div>
+        <h2 style="margin-bottom: 1rem; color: #166534;">Success!</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Your action was completed successfully.</p>
+        <a href="/" class="btn btn-primary" style="width: 100%;">Return Home</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}one8 Commune{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand-logo" style="font-family: 'Montserrat', sans-serif; letter-spacing: 2px; font-weight: 300; text-transform: lowercase; font-size: 1.8rem; color: #ffffff;">
+                one<span style="font-weight: 600;">8</span> <span style="font-family: 'Montserrat', sans-serif; font-size: 0.9rem; text-transform: uppercase; font-weight: 400; letter-spacing: 4px; display: block; margin-top: -5px; margin-left: 5px;">Commune</span>
+            </a>
+            <div class="nav-links">
+                {% if username == 'admin' %}
+                    <a href="{% url 'open_show_restaurant' %}" class="nav-link">Restaurants <span style="font-size: 0.7rem; opacity: 0.6; margin-left: 2px;">▼</span></a>
+                    <a href="{% url 'open_add_restaurant' %}" class="nav-link">Add Restaurant <span style="font-size: 0.7rem; opacity: 0.6; margin-left: 2px;">▼</span></a>
+                    <a href="/" class="nav-btn">Sign Out</a>
+                {% elif username %}
+                    <span class="nav-link" style="cursor:default; color: #ffffff;">Hi, {{ username }}</span>
+                    <a href="{% url 'show_cart' username %}" class="nav-link cart-link">Cart</a>
+                    <a href="{% url 'orders' username %}" class="nav-link">Orders</a>
+                    <a href="/" class="nav-btn">Sign Out</a>
+                {% else %}
+                    <a href="{% url 'open_admin_login' %}" class="nav-link">Admin Access</a>
+                    <a href="{% url 'open_signin' %}" class="nav-link">Sign In</a>
+                    <a href="{% url 'open_signup' %}" class="nav-btn">Get Started</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container" style="display: flex; justify-content: space-between; align-items: center;">
+            <p>&copy; {% now "Y" %} one8 Commune. All rights reserved.</p>
+            <a href="{% url 'open_admin_login' %}" style="color: var(--text-muted); font-size: 0.9rem; text-decoration: underline;">Admin Portal</a>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

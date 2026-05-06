@@ -1,79 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout</title>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-</head>
-<body>
-    <h1>Checkout</h1>
-    <h2>Welcome, {{ username }}</h2>
+{% extends 'delivery/base.html' %}
+
+{% block title %}Checkout | one8 Commune{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in" style="max-width: 600px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2>Checkout securely</h2>
+        <p style="color: var(--text-muted);">Review your order and complete payment</p>
+    </div>
 
     {% if error %}
-    <p style="color: red;">{{ error }}</p>
+    <div class="card" style="background-color: #fef2f2; border-color: #fecaca; margin-bottom: 2rem;">
+        <p style="color: #b91c1c; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚠️</span> {{ error }}
+        </p>
+    </div>
     {% else %}
-
-
-
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Item</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="card" style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">Order Summary</h3>
+        
+        <div style="margin-bottom: 1.5rem;">
             {% for item in cart_items %}
-            <tr>
-                <td>{{ item.name }}</td>
-                <td>₹{{ item.price }}</td>
-            </tr>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span>{{ item.name }}</span>
+                <span style="font-weight: 500;">₹{{ item.price }}</span>
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
-    <h3>Total: ₹{{ total_price }}</h3>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+            <h3 style="margin: 0;">Total to pay</h3>
+            <h3 style="margin: 0; color: var(--primary);">₹{{ total_price }}</h3>
+        </div>
+    </div>
 
-
-
-    
-
-    <button id="rzp-button">Pay with Razorpay</button>
+    <button id="rzp-button" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 0.75rem;">
+        Pay Securely with Razorpay 🔒
+    </button>
     {% endif %}
+</div>
+{% endblock %}
 
-
-    
-
-    <script>
-        var options = {
-            "key": "{{ rzp_test_lT6VV3Hhr4ayCQ }}",  // Razorpay API key
-            "amount": "{{ total_price|floatformat:2|add:'0.00'|floatformat:2 }}00", // Amount in paisa
-            "currency": "INR",
-            "name": "Meal Buddy",
-            "description": "Order Payment",
-            "order_id": "{{ order_id }}",  // Razorpay order ID
-            "handler": function (response) {
-                alert("Payment Successful!");
-                // Redirect to the orders page
-                window.location.href = "{% url 'orders' username %}";
-            },
-            "prefill": {
-                "name": "{{ username }}",
-                "email": "customer@example.com",
-                "contact": "9999999999"
-            },
-            "theme": {
-                "color": "#528FF0"
-            }
-        };
-        var rzp = new Razorpay(options);
-    
-        document.getElementById('rzp-button').onclick = function(e) {
-            rzp.open();
-            e.preventDefault();
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% if not error %}
+<script>
+    var options = {
+        "key": "{{ razorpay_key_id }}",  // Razorpay API key
+        "currency": "INR",
+        "name": "one8 Commune",
+        "description": "Order Payment",
+        "order_id": "{{ order_id }}",  // Razorpay order ID
+        "handler": function (response) {
+            alert("Payment Successful!");
+            // Redirect to the place_order page to save order and clear cart
+            window.location.href = "{% url 'place_order' username %}";
+        },
+        "prefill": {
+            "name": "{{ username }}",
+            "email": "customer@example.com",
+            "contact": "9999999999"
+        },
+        "theme": {
+            "color": "#f97316"
         }
-    </script>
-    
-</body>
-</html>
+    };
+    var rzp = new Razorpay(options);
+
+    document.getElementById('rzp-button').onclick = function(e) {
+        rzp.open();
+        e.preventDefault();
+    }
+</script>
+{% endif %}
+{% endblock %}

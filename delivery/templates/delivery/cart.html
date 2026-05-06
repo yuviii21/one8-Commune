@@ -1,39 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    Hi {{username}} here are you items
-    <!-- show current menu -->
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Item Image</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            {%  for item in itemList %}
+{% extends 'delivery/base.html' %}
+
+{% block title %}Cart | one8 Commune{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in" style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <h2>Your Cart, <span style="color: var(--primary);">{{username}}</span></h2>
+        <p style="color: var(--text-muted);">Review your items before checkout</p>
+    </div>
+
+    {% if itemList %}
+    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2rem;">
+        <table style="margin-bottom: 0;">
+            <thead style="background-color: var(--bg-elevated);">
                 <tr>
-                    <td>
-                        <img src="{{ item.picture }}">
-                    </td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.description }}</td>
-                    <td>{{ item.price }}</td>
+                    <th style="padding: 1rem 1.5rem;">Item</th>
+                    <th style="padding: 1rem 1.5rem;">Details</th>
+                    <th style="padding: 1rem 1.5rem; text-align: right;">Price</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-        <h2>Total price : {{total_price}}</h2>
-        
+            </thead>
+            <tbody>
+                {% for item in itemList %}
+                <tr>
+                    <td style="padding: 1rem 1.5rem; width: 80px;">
+                        <div style="width: 60px; height: 60px; border-radius: var(--radius-md); overflow: hidden; background-color: var(--bg-elevated);">
+                            {% if item.picture %}
+                            <img src="{{ item.picture }}" alt="{{ item.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍲</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="padding: 1rem 1.5rem;">
+                        <h4 style="margin: 0; font-size: 1rem;">{{ item.name }}</h4>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">{{ item.description|truncatechars:50 }}</p>
+                    </td>
+                    <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 600;">
+                        ₹{{ item.price }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="padding: 1.5rem; background-color: var(--bg-base); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 1.25rem;">Total Amount</h3>
+            <h3 style="margin: 0; font-size: 1.5rem; color: var(--primary);">₹{{ total_price }}</h3>
+        </div>
+    </div>
+
+    <div style="text-align: right;">
         <form action="{% url 'checkout' username %}">
-            <input type="submit" value="CHECK OUT" />
+            <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+                Proceed to Checkout
+            </button>
         </form>
-    </table>
-</body>
-</html>
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 4rem 2rem;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🛒</div>
+        <h3 style="margin-bottom: 0.5rem;">Your cart is empty</h3>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Looks like you haven't added any items to your cart yet.</p>
+        <a href="{% url 'customer_home' %}" class="btn btn-primary">Browse Restaurants</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

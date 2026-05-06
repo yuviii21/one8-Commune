@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
+from django.db.models import Q
 
-from .models import Customer, Restaurant, Item, Cart
+from .models import Customer, Restaurant, Item, Cart, AdminUser, Order
 
 import razorpay
 from django.conf import settings
@@ -45,17 +46,88 @@ def signin(request):
 
     try:
         Customer.objects.get(username = username, password = password)
-        if username == 'admin':
-            return render(request, 'delivery/admin_home.html')
-        else:
-            restaurantList = Restaurant.objects.all()
-            return render(request, 'delivery/customer_home.html',{"restaurantList" : restaurantList, "username" : username})
-
+        restaurantList = Restaurant.objects.all()
+        return render(request, 'delivery/customer_home.html',{"restaurantList" : restaurantList, "username" : username})
     except Customer.DoesNotExist:
         return render(request, 'delivery/fail.html')
+
+def customer_home(request, username):
+    query = request.GET.get('q', '')
+    cuisine_filter = request.GET.get('cuisine', '')
+    
+    restaurantList = Restaurant.objects.all()
+    
+    if query:
+        restaurantList = restaurantList.filter(
+            Q(name__icontains=query) | Q(items__name__icontains=query)
+        ).distinct()
+        
+    if cuisine_filter:
+        restaurantList = restaurantList.filter(cuisine__icontains=cuisine_filter)
+        
+    # Extract unique cuisines for the filter buttons
+    all_cuisines = Restaurant.objects.values_list('cuisine', flat=True).distinct()
+    
+    # Process cuisines (split by comma if multiple cuisines are in one string)
+    processed_cuisines = set()
+    for c in all_cuisines:
+        if c:
+            for part in c.split(','):
+                if part.strip():
+                    processed_cuisines.add(part.strip())
+    
+    cuisines = sorted(list(processed_cuisines))
+
+    return render(request, 'delivery/customer_home.html', {
+        "restaurantList": restaurantList, 
+        "username": username,
+        "query": query,
+        "current_cuisine": cuisine_filter,
+        "cuisines": cuisines
+    })
+
+def open_admin_login(request):
+    return render(request, 'delivery/admin_login.html')
+
+def admin_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        try:
+            AdminUser.objects.get(username=username, password=password)
+            return render(request, 'delivery/admin_home.html', {'username': username})
+        except AdminUser.DoesNotExist:
+            return render(request, 'delivery/fail.html')
+            
+    return render(request, 'delivery/fail.html')
+
+def open_admin_signup(request):
+    return render(request, 'delivery/admin_signup.html')
+
+def admin_signup(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+
+        try:
+            AdminUser.objects.get(username=username)
+            return HttpResponse("Duplicate admin username!")
+        except:
+            AdminUser.objects.create(
+                username=username,
+                password=password,
+                email=email,
+            )
+            return render(request, 'delivery/admin_login.html')
+    return render(request, 'delivery/admin_login.html')
+
+def admin_home(request):
+    return render(request, 'delivery/admin_home.html', {'username': 'admin'})
     
 def open_add_restaurant(request):
-    return render(request, 'delivery/add_restaurant.html')
+    return render(request, 'delivery/add_restaurant.html', {'username': 'admin'})
 
 def add_restaurant(request):
     if request.method == 'POST':
@@ -74,15 +146,15 @@ def add_restaurant(request):
                 cuisine = cuisine,
                 rating = rating,
             )
-    return render(request, 'delivery/admin_home.html')
+    return render(request, 'delivery/admin_home.html', {'username': 'admin'})
 
 def open_show_restaurant(request):
     restaurantList = Restaurant.objects.all()
-    return render(request, 'delivery/show_restaurants.html',{"restaurantList" : restaurantList})
+    return render(request, 'delivery/show_restaurants.html',{"restaurantList" : restaurantList, 'username': 'admin'})
 
 def open_update_restaurant(request, restaurant_id):
     restaurant = Restaurant.objects.get(id = restaurant_id)
-    return render(request, 'delivery/update_restaurant.html', {"restaurant" : restaurant})
+    return render(request, 'delivery/update_restaurant.html', {"restaurant" : restaurant, 'username': 'admin'})
 
 def update_restaurant(request, restaurant_id):
     restaurant = Restaurant.objects.get(id = restaurant_id)
@@ -100,7 +172,7 @@ def update_restaurant(request, restaurant_id):
         restaurant.save()
 
     restaurantList = Restaurant.objects.all()
-    return render(request, 'delivery/show_restaurants.html',{"restaurantList" : restaurantList})
+    return render(request, 'delivery/show_restaurants.html',{"restaurantList" : restaurantList, 'username': 'admin'})
 
 
 def delete_restaurant(request, restaurant_id):
@@ -108,14 +180,14 @@ def delete_restaurant(request, restaurant_id):
     restaurant.delete()
 
     restaurantList = Restaurant.objects.all()
-    return render(request, 'delivery/show_restaurants.html',{"restaurantList" : restaurantList})
+    return render(request, 'delivery/show_restaurants.html',{"restaurantList" : restaurantList, 'username': 'admin'})
 
 
 def open_update_menu(request, restaurant_id):
     restaurant = Restaurant.objects.get(id = restaurant_id)
     itemList = restaurant.items.all()
     #itemList = Item.objects.all()
-    return render(request, 'delivery/update_menu.html',{"itemList" : itemList, "restaurant" : restaurant})
+    return render(request, 'delivery/update_menu.html',{"itemList" : itemList, "restaurant" : restaurant, 'username': 'admin'})
     
 def update_menu(request, restaurant_id):
     restaurant = Restaurant.objects.get(id = restaurant_id)
@@ -139,7 +211,7 @@ def update_menu(request, restaurant_id):
                 vegeterian = vegeterian,
                 picture = picture,
             )
-    return render(request, 'delivery/admin_home.html')
+    return render(request, 'delivery/admin_home.html', {'username': 'admin'})
 
 def view_menu(request, restaurant_id, username):
     restaurant = Restaurant.objects.get(id = restaurant_id)
@@ -158,7 +230,7 @@ def add_to_cart(request, item_id, username):
 
     cart.items.add(item)
 
-    return HttpResponse('added to cart')
+    return redirect('show_cart', username=username)
 
 def show_cart(request, username):
     customer = Customer.objects.get(username = username)
@@ -203,22 +275,30 @@ def checkout(request, username):
     })
 
 
-# Orders Page
-def orders(request, username):
+def place_order(request, username):
     customer = get_object_or_404(Customer, username=username)
     cart = Cart.objects.filter(customer=customer).first()
 
-    # Fetch cart items and total price before clearing the cart
-    cart_items = cart.items.all() if cart else []
-    total_price = cart.total_price() if cart else 0
-
-    # Clear the cart after fetching its details
-    if cart:
+    if cart and cart.items.exists():
+        total_price = cart.total_price()
+        order = Order.objects.create(customer=customer, total_price=total_price)
+        order.items.set(cart.items.all())
         cart.items.clear()
+        
+        return render(request, 'delivery/order_success.html', {
+            'username': username,
+            'customer': customer,
+            'order': order,
+        })
+    
+    return redirect('customer_home', username=username)
+
+# Orders Page
+def orders(request, username):
+    customer = get_object_or_404(Customer, username=username)
+    order_history = Order.objects.filter(customer=customer).order_by('-created_at')
 
     return render(request, 'delivery/orders.html', {
         'username': username,
-        'customer': customer,
-        'cart_items': cart_items,
-        'total_price': total_price,
+        'order_history': order_history,
     })

@@ -1,0 +1,35 @@
+{% extends 'delivery/base.html' %}
+
+{% block title %}Order Successful | one8 Commune{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in" style="max-width: 600px; margin: 0 auto;">
+    <div class="card" style="text-align: center; padding: 3rem 2rem;">
+        <div style="font-size: 5rem; margin-bottom: 1rem; color: #22c55e;">
+            ✅
+        </div>
+        <h2 style="margin-bottom: 1rem;">Thank you for your order, {{ username }}!</h2>
+        
+        <div style="background-color: var(--bg-elevated); padding: 1.5rem; border-radius: var(--radius-md); margin: 2rem 0; text-align: left;">
+            <h4 style="margin-top: 0; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📍</span> Delivery Address
+            </h4>
+            <p style="margin: 0; color: var(--text-muted); line-height: 1.6;">{{ customer.address }}</p>
+        </div>
+
+        <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 1rem; border-radius: var(--radius-md); margin: 2rem 0; text-align: left; display: flex; justify-content: space-between;">
+            <h4 style="margin: 0; color: #1e3a8a;">Total Paid:</h4>
+            <span style="font-weight: bold; color: #1e3a8a;">₹{{ order.total_price }}</span>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+            Your order will be delivered to this location shortly. Thank you for choosing one8 Commune! We hope you enjoy your meal.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="{% url 'orders' username %}" class="btn btn-secondary">View Order History</a>
+            <a href="{% url 'customer_home' username %}" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

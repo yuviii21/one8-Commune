@@ -1,15 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Page</title>
-</head>
-<body>
-    <h3>Welcome to Admin HOME!</h3>
+{% extends 'delivery/base.html' %}
 
-    <a href="open_add_restaurant">ADD NEW RESTAURANT</a>
-    <br><br>
-    <a href="open_show_restaurant">SHOW RESTAURANTS</a>
-</body>
-</html>
+{% block title %}Admin Dashboard | one8 Commune{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in" style="max-width: 800px; margin: 0 auto; text-align: center;">
+    <div style="margin-bottom: 3rem;">
+        <h2>Admin Dashboard</h2>
+        <p style="color: var(--text-muted);">Manage your platform efficiently</p>
+    </div>
+
+    <div class="grid-cards">
+        <a href="{% url 'open_add_restaurant' %}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 2rem; text-decoration: none;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">➕</div>
+            <h3 style="margin-bottom: 0.5rem;">Add New Restaurant</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Onboard a new partner to the platform</p>
+        </a>
+
+        <a href="{% url 'open_show_restaurant' %}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 2rem; text-decoration: none;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+            <h3 style="margin-bottom: 0.5rem;">Show Restaurants</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">View and manage existing restaurants</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
