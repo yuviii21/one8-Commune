@@ -44,12 +44,17 @@ def signin(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-    try:
-        Customer.objects.get(username = username, password = password)
-        restaurantList = Restaurant.objects.all()
-        return render(request, 'delivery/customer_home.html',{"restaurantList" : restaurantList, "username" : username})
-    except Customer.DoesNotExist:
-        return render(request, 'delivery/fail.html')
+        try:
+            Customer.objects.get(username = username, password = password)
+            restaurantList = Restaurant.objects.all()
+            return render(request, 'delivery/customer_home.html',{"restaurantList" : restaurantList, "username" : username})
+        except Customer.DoesNotExist:
+            return render(request, 'delivery/fail.html')
+        except Exception as e:
+            print(f"Error during signin: {e}")
+            return render(request, 'delivery/fail.html')
+    
+    return render(request, 'delivery/signin.html')
 
 def customer_home(request, username):
     query = request.GET.get('q', '')
@@ -99,8 +104,11 @@ def admin_login(request):
             return render(request, 'delivery/admin_home.html', {'username': username})
         except AdminUser.DoesNotExist:
             return render(request, 'delivery/fail.html')
+        except Exception as e:
+            print(f"Error during admin signin: {e}")
+            return render(request, 'delivery/fail.html')
             
-    return render(request, 'delivery/fail.html')
+    return render(request, 'delivery/admin_login.html')
 
 def open_admin_signup(request):
     return render(request, 'delivery/admin_signup.html')
