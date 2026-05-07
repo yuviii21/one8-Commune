@@ -51,11 +51,12 @@ def signin(request):
         password = request.POST.get('password')
 
         try:
-            Customer.objects.get(username = username, password = password)
-            restaurantList = Restaurant.objects.all()
-            return render(request, 'delivery/customer_home.html',{"restaurantList" : restaurantList, "username" : username})
-        except Customer.DoesNotExist:
-            return render(request, 'delivery/fail.html')
+            customer = Customer.objects.filter(Q(username=username) | Q(email=username), password=password).first()
+            if customer:
+                restaurantList = Restaurant.objects.all()
+                return render(request, 'delivery/customer_home.html',{"restaurantList" : restaurantList, "username" : customer.username})
+            else:
+                return render(request, 'delivery/fail.html')
         except Exception as e:
             print(f"Error during signin: {e}")
             return render(request, 'delivery/fail.html')
