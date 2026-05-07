@@ -107,10 +107,11 @@ def admin_login(request):
         password = request.POST.get('password')
         
         try:
-            AdminUser.objects.get(username=username, password=password)
-            return render(request, 'delivery/admin_home.html', {'username': username})
-        except AdminUser.DoesNotExist:
-            return render(request, 'delivery/fail.html')
+            admin_user = AdminUser.objects.filter(Q(username=username) | Q(email=username), password=password).first()
+            if admin_user:
+                return render(request, 'delivery/admin_home.html', {'username': admin_user.username})
+            else:
+                return render(request, 'delivery/fail.html')
         except Exception as e:
             print(f"Error during admin signin: {e}")
             return render(request, 'delivery/fail.html')
