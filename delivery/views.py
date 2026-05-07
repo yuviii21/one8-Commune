@@ -28,14 +28,20 @@ def signup(request):
         try:
             Customer.objects.get(username = username)
             return HttpResponse("Duplicate username!")
-        except:
-            Customer.objects.create(
-                username = username,
-                password = password,
-                email = email,
-                mobile = mobile,
-                address = address,
-            )
+        except Customer.DoesNotExist:
+            try:
+                Customer.objects.create(
+                    username = username,
+                    password = password,
+                    email = email,
+                    mobile = mobile,
+                    address = address,
+                )
+            except Exception as e:
+                return HttpResponse(f"Database Error: {e}. If on Vercel, ensure your DATABASE_URL is configured to a PostgreSQL database (SQLite is read-only).")
+        except Exception as e:
+            return HttpResponse(f"Error: {e}")
+            
     return render(request, 'delivery/signin.html')
 
 
@@ -122,13 +128,19 @@ def admin_signup(request):
         try:
             AdminUser.objects.get(username=username)
             return HttpResponse("Duplicate admin username!")
-        except:
-            AdminUser.objects.create(
-                username=username,
-                password=password,
-                email=email,
-            )
-            return render(request, 'delivery/admin_login.html')
+        except AdminUser.DoesNotExist:
+            try:
+                AdminUser.objects.create(
+                    username=username,
+                    password=password,
+                    email=email,
+                )
+                return render(request, 'delivery/admin_login.html')
+            except Exception as e:
+                return HttpResponse(f"Database Error: {e}. If on Vercel, ensure your DATABASE_URL is configured correctly.")
+        except Exception as e:
+            return HttpResponse(f"Error: {e}")
+            
     return render(request, 'delivery/admin_login.html')
 
 def admin_home(request):
