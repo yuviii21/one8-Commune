@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+myenv/
+
+# Database
+db.sqlite3
+db.sqlite3-journal
+
+# Static
+staticfiles/
+
+# OS Files
+.DS_Store
+Thumbs.db
+checkout.html

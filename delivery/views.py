@@ -253,16 +253,36 @@ def checkout(request, username):
             'error': 'Your cart is empty!',
         })
 
-    # Initialize Razorpay client
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    # Debug: print current Razorpay keys (temporary)
+    print(f"DEBUG: RAZORPAY_KEY_ID={settings.RAZORPAY_KEY_ID!r}, RAZORPAY_KEY_SECRET={settings.RAZORPAY_KEY_SECRET!r}")
 
-    # Create Razorpay order
-    order_data = {
-        'amount': int(total_price * 100),  # Amount in paisa
-        'currency': 'INR',
-        'payment_capture': '1',  # Automatically capture payment
-    }
-    order = client.order.create(data=order_data)
+    if not settings.RAZORPAY_KEY_ID or not settings.RAZORPAY_KEY_SECRET:
+        return render(request, 'delivery/checkout.html', {
+            'username': username,
+            'cart_items': cart_items,
+            'total_price': total_price,
+            'error': 'Payment gateway is not configured. Please contact support.',
+        })
+
+    try:
+        # Initialize Razorpay client
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+        # Create Razorpay order
+        order_data = {
+            'amount': int(total_price * 100),  # Amount in paisa
+            'currency': 'INR',
+            'payment_capture': '1',  # Automatically capture payment
+        }
+        order = client.order.create(data=order_data)
+    except Exception as e:
+        print("Razorpay error:", e)
+        return render(request, 'delivery/checkout.html', {
+            'username': username,
+            'cart_items': cart_items,
+            'total_price': total_price,
+            'error': 'Unable to start Razorpay checkout right now. Please try again later.',
+        })
 
     # Pass the order details to the frontend
     return render(request, 'delivery/checkout.html', {

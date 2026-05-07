@@ -167,6 +167,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', '')
 RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
 
+# Fallback to test keys in local development if env vars are not set
+if DEBUG and (not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET):
+    RAZORPAY_KEY_ID = 'rzp_test_Sm9ltTDlv2VWmH'
+    RAZORPAY_KEY_SECRET = 'n2S5WBKA8VeSrYujOQaxmZ85'
+
 
 
 
